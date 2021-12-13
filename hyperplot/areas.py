@@ -1,10 +1,52 @@
-def plot_hypergraph_areas(decomposed_edges, labelslist, edgecolor=None, nodecolor=None, linewidth=1):
+import numpy as np
+import hypernetx as hnx
+import matplotlib.pyplot as plt
+
+def areas(decomposed_edges,
+          nodelabels=None,
+          nodecolors=None,
+          edgecolors=None,
+          linewidth=1):
+
+    '''
+    Plots hypergraph where nodes are points where each edges is an area
+    encircling nodes in edge.
+
+    An edge is a k-tuple of nodes (e.g. (2,4,6)) where k is the edge order.
+
+    Parameters
+    ----------
+    decomposed_edges : dict ({order : list of edges})
+        dictionary with list of edges for each multiplet order
+
+    nodelabels : dict
+        dictionary from node to node label
+
+    nodecolors : dict
+        dictionary from node to color
+
+    edgecolors : color string or dict
+        either a color for all edges, or a map from edges to color.
+        
+    linewidth : float
+        line width of areas.
+    '''
+
     nrows = len(decomposed_edges.keys())
     fig, axs = plt.subplots(1, nrows, figsize=(5 * nrows, 5))
 
+    if nodelabels is not None:
+        nodecolors = {nodelabels[node]: color for node, color in nodecolors.items()}
+
     orders = decomposed_edges.keys()
     for n, order in enumerate(orders):
-        H = hnx.Hypergraph(decomposed_edges[order])
+        if nodelabels is None:
+            edges = decomposed_edges[order]
+        else: # refactors edge names in 'decomposed_edges' and 'nodecolor' using 'nodelabels'
+            edges = decomposed_edges[order]
+            edges = [tuple([nodelabels[e] for e in edge]) for edge in edges]
+
+        H = hnx.Hypergraph(edges)
 
         if len(decomposed_edges[order]) == 0:
             hnx.drawing.draw(H, ax=axs[n])
@@ -12,31 +54,34 @@ def plot_hypergraph_areas(decomposed_edges, labelslist, edgecolor=None, nodecolo
             print(f'Order {order} has no edges.')
         else:
             # get vals
-            if edgecolor is None:
+            if edgecolors is None:
                 edges_kwargs = {}
-            elif isinstance(edgecolor, dict):
+            elif isinstance(edgecolors, dict):
                 cmap = plt.cm.viridis
                 alpha = .8
                 edge_elements = [tuple(H.edges[edge].elements) for edge in H.edges]
-                vals = np.array([edgecolor[e] for e in edge_elements])
+                vals = np.array([edgecolors[e] for e in edge_elements])
                 norm = plt.Normalize(vals.min(), vals.max())
-                edgecolor = cmap(norm(vals)) * (1, 1, 1, alpha)
-                edges_kwargs = dict(edgecolors=edgecolor, linewidth=linewidth)
+                edgecolors = cmap(norm(vals)) * (1, 1, 1, alpha)
+                edges_kwargs = dict(edgecolors=edgecolors, linewidth=linewidth)
             else:
-                edges_kwargs = dict(edgecolors=edgecolor, linewidth=linewidth)
+                edges_kwargs = dict(edgecolors=edgecolors, linewidth=linewidth)
 
-            if nodecolor is None:
-                nodecolor = 'black'
-            if isinstance(nodecolor, dict):
+            if nodecolors is None:
+                nodecolors = 'black'
+
+            if isinstance(nodecolors, dict):
                 nodes = list(H.nodes)
-                nodecol_nodes = np.array([nodecolor[labelslist.index(nodes[node])] for node in range(len(nodes))])
+                nodecolor_list = np.array([nodecolors[node] for node in nodes])
+                # nodes = list(H.nodes)
+                # nodecol_nodes = np.array([nodecolor[labelslist.index(nodes[node])] for node in range(len(nodes))])
 
             hnx.drawing.draw(H,
                              label_alpha=0,
                              with_edge_labels=False,
                              with_node_labels=True,
                              nodes_kwargs={
-                                 'facecolors': nodecol_nodes
+                                 'facecolors': nodecolor_list
                              },
                              edges_kwargs=edges_kwargs,
                              node_labels_kwargs={
@@ -45,4 +90,3 @@ def plot_hypergraph_areas(decomposed_edges, labelslist, edgecolor=None, nodecolo
                              ax=axs[n])
 
             axs[n].set_title(f'Multiplet Order: {order}')
-#     plt.savefig('hypergraph.png', dpi=400)

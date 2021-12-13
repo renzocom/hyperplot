@@ -1,7 +1,17 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+from networkx import NetworkXException
 
 def planar(hypergraph):
+    '''
+    Plots hypergraph using random planar layout.
+
+    Parameters
+    ----------
+    hypergraph : dict
+        decomposed hypergraph. dict from order to hypergraph.
+
+    '''
     ncols = len(hypergraph.keys())
 
     # Setup multiplot style
