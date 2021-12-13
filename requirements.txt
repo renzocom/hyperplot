@@ -1,0 +1,5 @@
+hypernetx==1.2
+hypernetx.egg==info
+matplotlib==3.2.2
+networkx==2.3
+numpy==1.20.3
