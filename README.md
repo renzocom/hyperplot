@@ -1,7 +1,7 @@
 # hyperplot
 Short library to plot high-order interactions.
 
-<img src="figs/source/images/harrypotter_basic_hyp.png" align="right" width="300pt">
+<img src="figs/banner.png" align="right" width="300pt">
 
 Visualization functions:
 ```python
