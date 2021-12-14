@@ -40,10 +40,9 @@ def areas(decomposed_edges,
 
     orders = decomposed_edges.keys()
     for n, order in enumerate(orders):
-        if nodelabels is None:
-            edges = decomposed_edges[order]
-        else: # refactors edge names in 'decomposed_edges' and 'nodecolor' using 'nodelabels'
-            edges = decomposed_edges[order]
+        edges = decomposed_edges[order]
+        if nodelabels is not None:
+            # refactors edge names in 'decomposed_edges' and 'nodecolor' using 'nodelabels'
             edges = [tuple([nodelabels[e] for e in edge]) for edge in edges]
 
         H = hnx.Hypergraph(edges)
