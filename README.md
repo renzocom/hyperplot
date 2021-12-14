@@ -1,10 +1,12 @@
-<img src="figs/banner.png" align="right" width="150pt">
+<img src="figs/banner.png" align="right" width="200pt">
 
 # hyperplot
-Short library to plot high-order interactions.
+A short high-level library to plot high-order interactions based on HyperNetX.
 
+**Authors:** Renzo Comolatti and Daniele Marinazzo
+<br />
 
-Visualization functions:
+## Visualization functions:
 ```python
 
 two_rows(decomposed_edges, nodelabels=nodelabels, nodecolors=nodecolors, column_spacing=2.5, nodesize=0.11, subplot_width=12)
