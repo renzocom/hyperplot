@@ -1,4 +1,4 @@
-<img src="figs/banner.png" align="right" width="300pt">
+<img src="figs/banner.png" align="right" width="150pt">
 
 # hyperplot
 Short library to plot high-order interactions.
