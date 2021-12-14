@@ -1,7 +1,8 @@
+<img src="figs/banner.png" align="right" width="300pt">
+
 # hyperplot
 Short library to plot high-order interactions.
 
-<img src="figs/banner.png" align="right" width="300pt">
 
 Visualization functions:
 ```python
