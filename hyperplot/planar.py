@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from networkx import NetworkXException
 
-import hyperplot.tools
+import hyperplot.utils
 
 def planar(decomposed_edges, nodes=None, nodelabels=None):
     '''
@@ -43,7 +43,7 @@ def planar(decomposed_edges, nodes=None, nodelabels=None):
             # refactors edge names in 'decomposed_edges' and 'nodecolor' using 'nodelabels'
             edges = [tuple([nodelabels[e] for e in edge]) for edge in edges]
 
-        g = hyperplot.tools.create_hypergraph(nodes, edges, remove_isolated_nodes=True)
+        g = hyperplot.utils.create_hypergraph(nodes, edges, remove_isolated_nodes=True)
 
         # I like planar layout, but it cannot be used in general
         try:

@@ -1,7 +1,8 @@
+<img src="figs/eating_areas_syn_labels.png" align="right" width="700pt">
+
+
 # hyperplot
 Short library to plot high-order interactions.
-
-<img src="figs/source/images/harrypotter_basic_hyp.png" align="right" width="300pt">
 
 Visualization functions:
 ```python
