@@ -1,6 +1,5 @@
 <img src="figs/eating_areas_syn_labels.png" align="right" width="700pt">
 
-=======
 <img src="figs/banner.png" align="right" width="200pt">
 
 # hyperplot
