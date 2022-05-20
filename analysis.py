@@ -1,3 +1,7 @@
+# author: Renzo Comolatti (renzo.com@gmail.com)
+# created: 5/2022
+# summary: Scripts to load and plot O-info analysis using the hyperplot toolbox.
+
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
@@ -206,36 +210,7 @@ def load_dataset(fpath, min_ord, max_ord):
     add_hypergraph2data(data)
     return data
 
-def plot_two_rows(data, column_spacing=2.5, nodesize=0.11, subplot_width=20, subplot_height=4):
-    '''
-    Plot O-info hypergraph using bipartite two row visualization
-
-    Parameters
-    ----------
-    data : dict
-    '''
-    n_plots = len(data['orders'])
-    nodelabels = data['node2labels']
-    nodeorder = data['nodeorder']
-    nodecolors = data['node2colors']
-
-    fig, axs = plt.subplots(n_plots, 2, figsize=(subplot_width, n_plots * subplot_height))
-
-    for i, kind in enumerate(['red', 'syn']):
-        for n, order in enumerate(data['edges'][kind].keys()):
-            ax = axs[i] if n_plots == 1 else axs[n, i]
-            edges = data['edges'][kind][order]
-            hyperplot.two_rows(edges,
-                               nodelabels=nodelabels,
-                               nodecolors=nodecolors,
-                               nodeorder=nodeorder,
-                               ax=ax,
-                               nodesize=nodesize,
-                               column_spacing=column_spacing)
-            if n==1:
-                ax.set_title(f'{kind.upper()}\nMultiplet Order: {order}', fontsize=16)
-            else:
-                ax.set_title(f'Multiplet Order: {order}', fontsize=16)
+## FUNCTIONS TO PLOT O-INFO ANALYSIS USING HYPERPLOT
 
 def plot_polygons(data, internode_dists=[None, None], show_nodelabels=False, **kwargs):
     '''
@@ -276,11 +251,93 @@ def plot_polygons(data, internode_dists=[None, None], show_nodelabels=False, **k
         for j, n in enumerate(decomposed_edges.keys()):
             ax = axs[i, j + 1]
             edges = decomposed_edges[n]
-            if len(edges) > 1:
+            if len(edges) > 0:
                 hyperplot.polygons(edges, ax=ax, nodecolors=nodecolors, nodelabels=nodelabels, internode_dist=internode_dists[i], **kwargs)
             else:
                 ax.axis('off')
             ax.set_title(f"Multiplet Order: {n}")
+
+def plot_two_rows(data, column_spacing=2.5, nodesize=0.11, subplot_width=20, subplot_height=4):
+    '''
+    Plot O-info hypergraph using bipartite two row visualization from hypernetx
+
+    Parameters
+    ----------
+    data : dict
+    '''
+    n_plots = len(data['orders'])
+    nodelabels = data['node2labels']
+    nodeorder = data['nodeorder']
+    nodecolors = data['node2colors']
+
+    fig, axs = plt.subplots(n_plots, 2, figsize=(subplot_width, n_plots * subplot_height))
+
+    for i, kind in enumerate(['red', 'syn']):
+        for n, order in enumerate(data['edges'][kind].keys()):
+            ax = axs[i] if n_plots == 1 else axs[n, i]
+            edges = data['edges'][kind][order]
+            hyperplot.two_rows(edges,
+                               nodelabels=nodelabels,
+                               nodecolors=nodecolors,
+                               nodeorder=nodeorder,
+                               ax=ax,
+                               nodesize=nodesize,
+                               column_spacing=column_spacing)
+            if n==1:
+                ax.set_title(f'{kind.upper()}\nMultiplet Order: {order}', fontsize=16)
+            else:
+                ax.set_title(f'Multiplet Order: {order}', fontsize=16)
+
+def plot_areas(data, edgecolors='gray'):
+    '''
+    Plot O-info hypergraph using concentric traces from hypernetx.
+
+    Parameters
+    ----------
+    data : dict
+    '''
+    nodelabels = data['node2labels']
+    nodecolors = data['node2colors']
+
+    n_plots = len(data['orders'])
+    fig, axs = plt.subplots(2, n_plots, figsize=(5 * n_plots, 10))
+
+    for i, kind in enumerate(['red', 'syn']):
+        for n, order in enumerate(data['edges'][kind].keys()):
+
+            ax = axs[i] if n_plots == 1 else axs[i, n]
+            edges = data['edges'][kind][order]
+
+            if len(edges) > 0:
+                hyperplot.areas(edges,
+                                nodelabels=nodelabels,
+                                nodecolors=nodecolors,
+                                edgecolors=edgecolors,
+                                ax=ax,
+                                linewidth=1)
+            else:
+                ax.axis('off')
+
+            ax.set_title(f'Multiplet Order: {order}')
+
+def plot_planar(data):
+
+    nodelabels = data['node2labels']
+
+    n_plots = len(data['orders'])
+    fig, axs = plt.subplots(2, n_plots, figsize=(5 * n_plots, 10))
+
+    for _, ax in np.ndenumerate(axs):
+        ax.axis('off')
+
+    for i, kind in enumerate(['red', 'syn']):
+        for n, order in enumerate(data['edges'][kind].keys()):
+            ax = axs[i] if n_plots == 1 else axs[i, n]
+            edges = data['edges'][kind][order]
+
+            hyperplot.planar(edges, nodelabels=nodelabels, ax=ax)
+
+            ax.set_title(f'Multiplet Order: {n + 3}')
 
 if __name__ == "__main__":
 
@@ -290,10 +347,12 @@ if __name__ == "__main__":
     savefig = True
     datasets = ['eating', 'empathy']
     plots = ['polygons', 'two_rows', 'areas', 'planar']
+    dataset = ['eating']
     plots = ['polygons']
 
     for dataset in datasets:
 
+        # LOAD DATA
         print(f'DATASET: {dataset.upper()}')
         print(8 * '=')
         if dataset=='eating':
@@ -306,7 +365,7 @@ if __name__ == "__main__":
         else:
             raise ValueError('Dataset not accepted.')
 
-
+        # PLOT DATA
         if 'polygons' in plots:
             plot_polygons(data, internode_dists=[1.6, None], show_nodelabels=True, **{'node_size':0.035})
             plt.suptitle(f'{dataset.upper()} Dataset', fontsize=20)
@@ -320,17 +379,14 @@ if __name__ == "__main__":
             if savefig:
                 plt.savefig(SAVE_DIR / f"{dataset}_two-rows.png", dpi=300)
 
-        kind_labels = ['Redundancy', 'Synergy']
-        for i, kind in enumerate(['red', 'syn']):
+        if 'areas' in plots:
+            plot_areas(data)
+            plt.suptitle(f"{dataset.upper()} Dataset", fontsize=20)
+            if savefig:
+                plt.savefig(SAVE_DIR / f"{dataset}_areas.png", dpi=300)
 
-            if 'areas' in plots:
-                hyperplot.areas(data['edges'][kind], nodelabels=nodelabels, edgecolors='gray', nodecolors=nodecolors)
-                plt.suptitle(f'{dataset.upper()} Dataset - {kind_labels[i]}', fontsize=20)
-                if savefig:
-                    plt.savefig(SAVE_DIR / f"{dataset}_areas_{kind}.png", dpi=300)
-
-            if 'planar' in plots:
-                hyperplot.planar(data['edges'][kind], data['nodes'], nodelabels=nodelabels)
-                plt.suptitle(f'{dataset.upper()} Dataset - {kind_labels[i]}', fontsize=20)
-                if savefig:
-                    plt.savefig(SAVE_DIR / f"{dataset}_planar_{kind}.png", dpi=300)
+        if 'planar' in plots:
+            plot_planar(data)
+            plt.suptitle(f'{dataset.upper()} Dataset', fontsize=20)
+            if savefig:
+                plt.savefig(SAVE_DIR / f"{dataset}_planar.png", dpi=300)

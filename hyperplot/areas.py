@@ -2,10 +2,11 @@ import numpy as np
 import hypernetx as hnx
 import matplotlib.pyplot as plt
 
-def areas(decomposed_edges,
+def areas(edges,
           nodelabels=None,
           nodecolors=None,
           edgecolors=None,
+          ax=None,
           linewidth=1):
 
     '''
@@ -32,60 +33,48 @@ def areas(decomposed_edges,
         line width of areas.
     '''
 
-    nrows = len(decomposed_edges.keys())
-    fig, axs = plt.subplots(1, nrows, figsize=(5 * nrows, 5))
-
     if nodelabels is not None:
         nodecolors = {nodelabels[node]: color for node, color in nodecolors.items()}
 
-    orders = decomposed_edges.keys()
-    for n, order in enumerate(orders):
-        edges = decomposed_edges[order]
-        if nodelabels is not None:
-            # refactors edge names in 'decomposed_edges' and 'nodecolor' using 'nodelabels'
-            edges = [tuple([nodelabels[e] for e in edge]) for edge in edges]
+    if nodelabels is not None:
+        # refactors edge names in 'decomposed_edges' and 'nodecolor' using 'nodelabels'
+        edges = [tuple([nodelabels[e] for e in edge]) for edge in edges]
 
-        H = hnx.Hypergraph(edges)
+    H = hnx.Hypergraph(edges)
 
-        if len(decomposed_edges[order]) == 0:
-            hnx.drawing.draw(H, ax=axs[n])
-            axs[n].set_title(f'Multiplet Order: {order}')
-            print(f'Order {order} has no edges.')
-        else:
-            # get vals
-            if edgecolors is None:
-                edges_kwargs = {}
-            elif isinstance(edgecolors, dict):
-                cmap = plt.cm.viridis
-                alpha = .8
-                edge_elements = [tuple(H.edges[edge].elements) for edge in H.edges]
-                vals = np.array([edgecolors[e] for e in edge_elements])
-                norm = plt.Normalize(vals.min(), vals.max())
-                edgecolors = cmap(norm(vals)) * (1, 1, 1, alpha)
-                edges_kwargs = dict(edgecolors=edgecolors, linewidth=linewidth)
-            else:
-                edges_kwargs = dict(edgecolors=edgecolors, linewidth=linewidth)
+    # get vals
+    if edgecolors is None:
+        edges_kwargs = {}
+    elif isinstance(edgecolors, dict):
+        cmap = plt.cm.viridis
+        alpha = .8
+        edge_elements = [tuple(H.edges[edge].elements) for edge in H.edges]
+        vals = np.array([edgecolors[e] for e in edge_elements])
+        norm = plt.Normalize(vals.min(), vals.max())
+        edgecolors = cmap(norm(vals)) * (1, 1, 1, alpha)
+        edges_kwargs = dict(edgecolors=edgecolors, linewidth=linewidth)
+    else:
+        edges_kwargs = dict(edgecolors=edgecolors, linewidth=linewidth)
 
-            if nodecolors is None:
-                nodecolors = 'black'
+    if nodecolors is None:
+        nodecolors = 'black'
 
-            if isinstance(nodecolors, dict):
-                nodes = list(H.nodes)
-                nodecolor_list = np.array([nodecolors[node] for node in nodes])
-                # nodes = list(H.nodes)
-                # nodecol_nodes = np.array([nodecolor[labelslist.index(nodes[node])] for node in range(len(nodes))])
+    if isinstance(nodecolors, dict):
+        nodes = list(H.nodes)
+        nodecolor_list = np.array([nodecolors[node] for node in nodes])
+        # nodes = list(H.nodes)
+        # nodecol_nodes = np.array([nodecolor[labelslist.index(nodes[node])] for node in range(len(nodes))])
 
-            hnx.drawing.draw(H,
-                             label_alpha=0,
-                             with_edge_labels=False,
-                             with_node_labels=True,
-                             nodes_kwargs={
-                                 'facecolors': nodecolor_list
-                             },
-                             edges_kwargs=edges_kwargs,
-                             node_labels_kwargs={
-                                 'fontsize': 14,
-                             },
-                             ax=axs[n])
+    hnx.drawing.draw(H,
+                     label_alpha=0,
+                     with_edge_labels=False,
+                     with_node_labels=True,
+                     nodes_kwargs={
+                         'facecolors': nodecolor_list
+                     },
+                     edges_kwargs=edges_kwargs,
+                     node_labels_kwargs={
+                         'fontsize': 14,
+                     },
+                     ax=ax)
 
-            axs[n].set_title(f'Multiplet Order: {order}')
