@@ -11,8 +11,20 @@ import toolbag.read_write
 
 import hyperplot
 
+# IMPORTANT NOTE:
+# Functions in this library load dataset by creating a 'data' structure (dict) with the following information that
+# is needed to call the plotting functions (e.g. plot_polygons(data)) that wrap around Hyperplot:
+#    data : dict
+#         'edges' : {'red': {order (int) : list of edges}, 'syn': {order (int) : list of edges}}
+#           (dictionary of edges for both redundancy and synergy, for each multiplex order)
+#         'node2labels' : {node : label}, None
+#         'node2colors' : {node : color}, None
+#         'orders' : list of int with multiplex orders (e.g. [3, 4, 5, 6])
+#
+# 'data' contains more field, but the ones above are essential to call the plotting functions here.
+
 ## FUNCTIONS TO LOAD DATASETS
-def rawdata2data(rawdata, min_ord=3, max_ord=7):
+def rawdata2data(rawdata, min_ord=3, max_ord=6):
     '''
     Input: rawdata (dict with '__header__', 'Otot', 'data' fields).
     Output: dict with Otot fields (sorted_red, index_red, bootsig_red, etc) and 'orders'.
@@ -21,7 +33,7 @@ def rawdata2data(rawdata, min_ord=3, max_ord=7):
     data = {'sorted_red': {}, 'index_red': {}, 'bootsig_red': {},
             'sorted_syn': {}, 'index_syn': {}, 'bootsig_syn': {}}
 
-    for order in range(min_ord, max_ord):
+    for order in range(min_ord, max_ord+1):
         for key in data.keys():
             tmp = rawdata['Otot'][order - 1][key]
 
@@ -33,7 +45,7 @@ def rawdata2data(rawdata, min_ord=3, max_ord=7):
             else:
                 data[key][order] = tmp  # python indexing
 
-    data['orders'] = list(range(min_ord, max_ord))
+    data['orders'] = list(range(min_ord, max_ord+1))
 
     return data
 
@@ -154,7 +166,7 @@ def load_empathy_dataset(fpath):
     nodeorder = {node: n for n, node in enumerate(nodes)}
 
     # load dataset
-    data = load_dataset(fpath, min_ord=3, max_ord=6)
+    data = load_dataset(fpath, min_ord=3, max_ord=5)
 
     data['nodeorder'] = nodeorder
     data['node2labels'] = node2labels
@@ -186,7 +198,7 @@ def load_eating_dataset(fpath):
     node2labels = {node:label for node, label in zip(range(1, len(labels)+1), labels)}
 
     # load dataset
-    data = load_dataset(fpath, min_ord=3, max_ord=7)
+    data = load_dataset(fpath, min_ord=3, max_ord=6)
 
     data['nodeorder'] = None
     data['node2labels'] = node2labels
@@ -194,7 +206,27 @@ def load_eating_dataset(fpath):
 
     return data
 
-def load_dataset(fpath, min_ord, max_ord):
+def load_fmri_dataset(fpath):
+    fMRI_color2nodes = {'#ffb169': [30, 41, 99, 45, 50],
+                        '#7eed64': [66, 76],
+                        '#348feb': [2, 5, 8, 4, 23, 97, 74, 79, 69],
+                        '#a35ef2': [6, 1, 25, 13, 14, 43, 19, 7, 98],
+                        '#e65555': [71, 65, 42, 93, 53, 83, 75, 31, 90, 78, 81, 95, 73, 70, 54, 96, 27],
+                        '#d1d1d1': [20, 35, 29, 52, 34, 24, 85],
+                        '#94fff6': [48, 77, 26, 88]}
+
+    node2colors = flip_color2node(fMRI_color2nodes)
+
+    data = load_dataset(fpath, min_ord=3, max_ord=6, n_dims=53)
+
+    data['nodeorder'] = None
+    data['node2labels'] = None
+    data['node2colors'] = node2colors
+
+    return data
+
+
+def load_dataset(fpath, min_ord, max_ord, n_dims=None, n_points=None):
     '''
     Load dataset (output from O-info analysis, i.e. Otot structure)
 
@@ -207,6 +239,9 @@ def load_dataset(fpath, min_ord, max_ord):
     data = rawdata2data(rawdata, min_ord, max_ord)
     if 'data' in rawdata.keys():
         add_datainfo2data(data, rawdata['data'])
+    else:
+        data['n_points'] = n_points
+        data['n_dims'] = n_dims
     add_hypergraph2data(data)
     return data
 
@@ -219,6 +254,11 @@ def plot_polygons(data, internode_dists=[None, None], show_nodelabels=False, **k
     Parameters
     ----------
     data : dict
+        'edges' : {'red': {order (int) : list of edges}, 'syn': {order (int) : list of edges}}
+        'node2labels' : {node : label}
+        'node2colors' : {node : color}
+        'orders' : list of int with multiplex orders (e.g. [3, 4, 5, 6])
+
     internode_dists : [float, float], where 1/np.sqrt(n_nodes) is the default optimal distance
     show_nodelabels : bool
     kwargs : node_size, nodelabel_xoffset, but see xgi.draw()
@@ -264,6 +304,11 @@ def plot_two_rows(data, column_spacing=2.5, nodesize=0.11, subplot_width=20, sub
     Parameters
     ----------
     data : dict
+        'edges' : {'red': {order (int) : list of edges}, 'syn': {order (int) : list of edges}}
+        'node2labels' : {node : label}
+        'node2colors' : {node : color}
+        'orders' : list of int with multiplex orders (e.g. [3, 4, 5, 6])
+        'nodeorder', list with order to plot nodes
     '''
     n_plots = len(data['orders'])
     nodelabels = data['node2labels']
@@ -295,6 +340,10 @@ def plot_areas(data, edgecolors='gray'):
     Parameters
     ----------
     data : dict
+        'edges' : {'red': {order (int) : list of edges}, 'syn': {order (int) : list of edges}}
+        'node2labels' : {node : label}
+        'node2colors' : {node : color}
+        'orders' : list of int with multiplex orders (e.g. [3, 4, 5, 6])
     '''
     nodelabels = data['node2labels']
     nodecolors = data['node2colors']
@@ -321,6 +370,17 @@ def plot_areas(data, edgecolors='gray'):
             ax.set_title(f'Multiplet Order: {order}')
 
 def plot_planar(data):
+    '''
+    Plot planar hypergraph using networkx.
+
+    Parameters
+    ----------
+    data : dict
+        'edges' : {'red': {order (int) : list of edges}, 'syn': {order (int) : list of edges}}
+        'node2labels' : {node : label}
+        'node2colors' : {node : color}
+        'orders' : list of int with multiplex orders (e.g. [3, 4, 5, 6])
+    '''
 
     nodelabels = data['node2labels']
 
