@@ -3,7 +3,7 @@
 <img src="figs/banner.png" align="right" width="200pt">
 
 # hyperplot
-A short high-level library to plot hypergraphs and O-information analysis based on HyperNetX.
+A short high-level library to plot hypergraphs and O-information analysis based on HyperNetX, [xgi](https://github.com/ComplexGroupInteractions/xgi) and networkx.
 
 Visualization functions:
 =======
