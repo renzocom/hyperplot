@@ -22,22 +22,27 @@ planar(edges, nodes, nodelabels=nodelabels) # based on networkx library
 ```
 
 ## analysis.py
-Functions in this script load O-information analysis output (see https://github.com/danielemarinazzo/HOI) by creating a 'data' structure (dict)
-is passed to the plotting functions, e.g. plot_polygons(data), that wrap around Hyperplot functions.
+Functions in this script load O-information analysis output from [HOI](https://github.com/danielemarinazzo/HOI) library by creating a 'data' structure (dict) that is passed to the plotting functions, e.g. plot_polygons(data), that wrap around Hyperplot functions.
 
 ## Installation
 `git clone https://github.com/renzocom/hyperplot.git`
 
 `cd hyperplot`
+
 `pip install -e .`
 
 Next, we need to install the modified versions of HypernetX (https://github.com/pnnl/HyperNetX) and xgi (https://github.com/ComplexGroupInteractions/xgi) which we will clone inside hyperplot directory:
 
 `git clone https://github.com/renzocom/xgi.git`
+
 `cd xgi`
+
 `pip install -e .\[all\]`
+
 `cd ..`
+
 `git clone -b new_viz https://github.com/renzocom/HyperNetX.git`
+
 `pip install .`
 
 ## Getting started
