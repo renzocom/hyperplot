@@ -43,6 +43,8 @@ Next, we need to install the modified versions of HypernetX (https://github.com/
 
 `git clone -b new_viz https://github.com/renzocom/HyperNetX.git`
 
+`cd hypernetx`
+
 `pip install .`
 
 ## Getting started
