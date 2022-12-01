@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import itertools
-import toolbag.read_write
+import scipy.io as sio
 
 import hyperplot
 
@@ -225,7 +225,6 @@ def load_fmri_dataset(fpath):
 
     return data
 
-
 def load_dataset(fpath, min_ord, max_ord, n_dims=None, n_points=None):
     '''
     Load dataset (output from O-info analysis, i.e. Otot structure)
@@ -234,8 +233,8 @@ def load_dataset(fpath, min_ord, max_ord, n_dims=None, n_points=None):
     -------
     data : dict ('sorted_red', 'index_red', 'bootsig_red', 'sorted_syn', 'index_syn', 'bootsig_syn')
     '''
-    rawdata = toolbag.read_write.loadmat(fpath)
-    rawdata['Otot'] = [toolbag.read_write._todict(x) for x in rawdata['Otot']]
+    rawdata = loadmat(fpath)
+    rawdata['Otot'] = [todict(x) for x in rawdata['Otot']]
     data = rawdata2data(rawdata, min_ord, max_ord)
     if 'data' in rawdata.keys():
         add_datainfo2data(data, rawdata['data'])
@@ -244,6 +243,41 @@ def load_dataset(fpath, min_ord, max_ord, n_dims=None, n_points=None):
         data['n_dims'] = n_dims
     add_hypergraph2data(data)
     return data
+
+# functions to load .mat
+def loadmat(fname):
+    """
+    this function should be called instead of direct spio.loadmat
+    as it cures the problem of not properly recovering python dictionaries
+    from mat files. It calls the function check keys to cure all entries
+    which are still mat-objects
+    """
+    fname = str(fname)
+    data = sio.loadmat(fname, struct_as_record=False, squeeze_me=True)
+    return _check_keys(data)
+
+def todict(matobj):
+    """
+    A recursive function which constructs from mat objects nested dictionaries
+    """
+    dict = {}
+    for strg in matobj._fieldnames:
+        elem = matobj.__dict__[strg]
+        if isinstance(elem, sio.matlab.mio5_params.mat_struct):
+            dict[strg] = _todict(elem)
+        else:
+            dict[strg] = elem
+    return dict
+
+def _check_keys(dict_in):
+    """
+    checks if entries in dictionary are mat-objects. If yes
+    todict is called to change them to nested dictionaries
+    """
+    for key in dict_in:
+        if isinstance(dict_in[key], sio.matlab.mio5_params.mat_struct):
+            dict_in[key] = _todict(dict_in[key])
+    return dict_in
 
 ## FUNCTIONS TO PLOT O-INFO ANALYSIS USING HYPERPLOT
 

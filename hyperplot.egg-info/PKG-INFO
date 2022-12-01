@@ -1,48 +1,13 @@
-Metadata-Version: 1.2
+Metadata-Version: 2.1
 Name: hyperplot
 Version: 0.0.0
 Summary: High-order interaction visualizations
 Home-page: https://github.com/renzocom/hyperplot
+Download-URL: https://github.com/renzocom/hyperplot/archive/v0.0.0.tar.gz
 Author: Renzo Comolatti & Daniele Marinazzo
 Author-email: renzo.com@gmail.com
 Maintainer: Renzo Comolatti
 License: GNU General Public License
-Download-URL: https://github.com/renzocom/hyperplot/archive/v0.0.0.tar.gz
-Description: <<<<<<< HEAD
-        <img src="figs/eating_areas_syn_labels.png" align="right" width="700pt">
-        
-        =======
-        <img src="figs/banner.png" align="right" width="200pt">
-        >>>>>>> a41783f85a95f5274038dcf8680c4976aba3dba0
-        
-        # hyperplot
-        A short high-level library to plot high-order interactions based on HyperNetX.
-        
-        <<<<<<< HEAD
-        Visualization functions:
-        =======
-        **Authors:** Renzo Comolatti and Daniele Marinazzo
-        <br />
-        
-        ## Visualization functions:
-        >>>>>>> a41783f85a95f5274038dcf8680c4976aba3dba0
-        ```python
-        
-        two_rows(decomposed_edges, nodelabels=nodelabels, nodecolors=nodecolors, column_spacing=2.5, nodesize=0.11, subplot_width=12)
-        
-        areas(decomposed_edges, nodelabels=None, nodecolors=None, edgecolors=None, linewidth=1)
-        
-        planar(decomposed_edges, nodes, nodelabels=nodelabels)
-        ```
-        
-        ## Requirements
-        
-        1. networkx==2.3
-        
-        2. my HyperNetX fork at 'new_viz' branch
-         
-        `git clone -b new_viz https://github.com/renzocom/HyperNetX.git`
-        
 Keywords: hypergraph plot highorder network
 Platform: any
 Classifier: Intended Audience :: Science/Research
@@ -51,3 +16,55 @@ Classifier: Intended Audience :: Developers
 Classifier: Topic :: Scientific/Engineering :: Visualization
 Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
+
+<img src="figs/eating_areas_syn_labels.png" align="right" width="700pt">
+
+<img src="figs/banner.png" align="right" width="200pt">
+
+# hyperplot
+A short high-level library to plot hypergraphs and O-information analysis based on [HyperNetX](https://github.com/pnnl/HyperNetX), [xgi](https://github.com/ComplexGroupInteractions/xgi) and [networkx](https://github.com/networkx).
+
+Visualization functions:
+=======
+**Authors:** Renzo Comolatti and Daniele Marinazzo
+<br />
+
+## Hyperplot functions to visualize hypergraphs:
+```python
+polygons(edges, nodecolors=nodecolors, nodelabels=nodelabels) # based on xgi library
+
+two_rows(edges, nodelabels=nodelabels, nodecolors=nodecolors, column_spacing=2.5, nodesize=0.11) # based on hypernetx library
+
+areas(edges, nodelabels=None, nodecolors=None, edgecolors=None, linewidth=1) # based on hypernetx library
+
+planar(edges, nodes, nodelabels=nodelabels) # based on networkx library
+```
+
+## analysis.py
+Functions in this script load O-information analysis output from [HOI](https://github.com/danielemarinazzo/HOI) library by creating a 'data' structure (dict) that is passed to the plotting functions, e.g. plot_polygons(data), that wrap around Hyperplot functions.
+
+## Installation
+`git clone https://github.com/renzocom/hyperplot.git`
+
+`cd hyperplot`
+
+`pip install -e .`
+
+Next, we need to install the modified versions of HypernetX (https://github.com/pnnl/HyperNetX) and xgi (https://github.com/ComplexGroupInteractions/xgi) which we will clone inside hyperplot directory:
+
+`git clone https://github.com/renzocom/xgi.git`
+
+`cd xgi`
+
+`pip install -e .\[all\]`
+
+`cd ..`
+
+`git clone -b new_viz https://github.com/renzocom/HyperNetX.git`
+
+`cd hypernetx`
+
+`pip install .`
+
+## Getting started
+Once installed open the jupyter notebook and try running the cells that plot the Empathy and Eating Disorders datasets.
