@@ -25,6 +25,8 @@ planar(edges, nodes, nodelabels=nodelabels) # based on networkx library
 Functions in this script load O-information analysis output from [HOI](https://github.com/danielemarinazzo/HOI) library by creating a 'data' structure (dict) that is passed to the plotting functions, e.g. plot_polygons(data), that wrap around Hyperplot functions.
 
 ## Installation
+(Tested on python 3.7)
+
 `git clone https://github.com/renzocom/hyperplot.git`
 
 `cd hyperplot`
